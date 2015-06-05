@@ -64,17 +64,19 @@ def get_events_user():
 	events = []
 	sql = text("select commit.id as id_commit, commit.date, commit.message, event.message as msg, event.type, event.id from event inner join commit on event.id_commit = commit.id where commit.developer='"+user+"'")
 	result = db.get_engine(app, 'db_events').execute(sql)
-#	sql = text("select modification.file, modification.type from modification inner join commit on commit.id = modification.id_commit where commit.id="+id_commit+";")
 	for row in result:
 		events.append({ 'date' : row["date"], 'commit_message' : row["message"], 'message' : row["msg"], 'type' : row["type"], 'id' : row["id"], 'id_commit' : row["id_commit"] })
 	return events
 
 def get_events_team():
 	events = []
-	sql = text("select commit.date, commit.message, event.message as msg, event.type, event.id from event inner join commit on event.id_commit = commit.id")
+	sql = text("select commit.id as id_commit, commit.date, commit.developer, commit.message, event.message as msg, event.type, event.id from event inner join commit on event.id_commit = commit.id")
 	result = db.get_engine(app, 'db_events').execute(sql)
 	for row in result:
-		events.append({ 'date' : row["date"], 'commit_message' : row["message"], 'message' : row["msg"], 'type' : row["type"], 'id' : row["id"] })
+		message = row["msg"]
+		if row["type"] == "Time Between Commits":
+			message = row["developer"] + " hadn't "+ message[11:-1] + "s"
+		events.append({ 'date' : row["date"], 'commit_message' : row["message"], 'message' : message, 'type' : row["type"], 'id' : row["id"], 'id_commit' : row["id_commit"], 'developer' : row["developer"] })
 	return events
 
 #TEMPLATE FILES
@@ -83,28 +85,29 @@ def show_home_page():
 	commits = get_commits_user()
 	months_categories = get_months_categories()
 	events = get_events_user()
-	return render_template('index.html', user=user, commits=commits, months_categories=months_categories, events=events)
+	return render_template('index.html', commits=commits, months_categories=months_categories, events=events)
 
 @app.route('/team/commits')
 def show_team_commits():
-	sql = text('select developer, count(*) from commit group by developer order by count(*) desc limit 10;')
+	sql = text('select author, count(*) from commit group by author order by count(*) desc limit 10;')
 	result = db.get_engine(app, 'db_commits').execute(sql)
 	commits = []
 
 	for row in result:
-		developer = str(row["developer"])
+		developer = str(row["author"])
 		commits_by_month = []
 
 		if developer != user:
 			for month in get_months_ordered():
-				sql = text("select count(*) from commit where developer='"+developer+"' and MONTH(date)="+str(month))
+				sql = text("select count(*) from commit where author='"+developer+"' and MONTH(date)="+str(month))
 				result = db.get_engine(app, 'db_commits').execute(sql)
 				n = str(result.fetchone()[0])
 				commits_by_month.append(int(n))
 			commits.append({ 'data' : commits_by_month, 'name' : developer })
 
 	months_categories = get_months_categories()
-	return render_template('team-commits.html', commits=commits, user=user, months_categories=months_categories)
+	events = get_events_team()
+	return render_template('team-commits.html', commits=commits, months_categories=months_categories, events=events)
 
 # REST API
 @app.route('/api/commits', methods = ['GET'])

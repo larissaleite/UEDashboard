@@ -40,6 +40,61 @@
 	            series: {{ commits|safe }}
 
 	        });
+
+	        $('.fa-thumbs-o-up').click(function() {
+		        	var id = $(this).attr('id');
+		        	$("#"+id).css('color', 'green');
+		        	id = id.replace("up", "down");
+		        	$("#"+id).css('color', 'black');
+		        });
+
+		        $('.fa-thumbs-o-down').click(function() {
+		        	var id = $(this).attr('id');
+		        	$("#"+id).css('color', 'red');
+		        	id = id.replace("down", "up");
+		        	$("#"+id).css('color', 'black');
+		        });
+
+		        $('.commit-detail').click(function() {
+					var id = $(this).attr('id');
+					var id_commit = id.split("_")[1]
+					$.ajax({
+			            url: '/api/commits_detail',
+			            contentType: 'application/json',
+			            data: JSON.stringify({
+			              id_commit: id_commit
+			            }),
+			            type: 'POST',
+			            dataType: 'json',
+			            success: function(response) {
+			                var json_array = response;
+			                //console.log(JSON.stringify(json_array, null, 4))
+			                $('#modal-commit').modal('toggle');
+			                $.each(response, function(index, element) {
+			                	var date = element[0].date;
+			                	date = date.substr(1,date.length-2);
+						  		$('#modal-commit-title').append("Commit by "+element[0].developer+" on "+date); 
+						  		var message = element[0].message.replace("Tarefa", "Task")
+						  		$('#modal-commit-body').append("<p id=\"task-title\"></p>");
+						  		$('#modal-commit-body').append("<p style=\"font-weight:bold\">Modifications</p>");	        
+						  		$('#task-title').append(message);
+						  		$.each(element[0].modifications, function(idx, modification) {
+						  			var file_complete = modification.file.split("/");
+						  			$('#modal-commit-body').append("<p>"+modification.type+" - "+file_complete[file_complete.length-1]+"</p>");
+						  		});      
+						    });
+			            },
+			            error: function(error) {
+			                console.log(error);
+			            }
+		        	});
+		        });
+
+				$(".modal").on("hidden.bs.modal", function(){
+				    $("#modal-commit-title").html("");
+				    $("#modal-commit-body").html("");
+				});
+
 		});
 	});
 </script>
@@ -53,10 +108,77 @@
 		#team-commits {
 			background-color: #383838;
 		}
+
+		td {
+			font-size: 14px;
+		}
+
+		.modal-body > p {
+			font-size: 16px;
+		}
+
+		td:first-child {
+			width: 60px;
+		}
 	</style>
 
 	<h3><span class="fa fa-bar-chart-o"></span>&nbsp;Dashboard</h3>
 
+	<div class="events">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Event Description</th>
+					<th>Feedback</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for event in events %}
+				<tr>
+					<td><span id="vote_up_{{ event.id }}" style="margin-right: 15%;" class="fa fa-thumbs-o-up fa-lg"></span><span id="vote_down_{{ event.id }}" class="fa fa-thumbs-o-down fa-lg"></span></td>
+					<td>{{ event.message }} - <a class="commit-detail" id="{{ event.id }}_{{ event.id_commit }}" href="#">commit</a> by {{ event.developer }} on {{ event.date}}</td>
+					<td><button class="btn btn-default" data-toggle="modal" data-target="#modal-feedback">Comment</button></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
 	<div id="chart-commits" class="charts"></div>
+
+	<div class="modal fade" id="modal-feedback" role="dialog">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">Feedback</h4>
+	      </div>
+	      <div class="modal-body">
+	        <textarea class="form-control"></textarea>
+	      </div>
+	      <div class="modal-footer">
+	      <button class="btn btn-success" data-dismiss="modal">Submit</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<div class="modal fade" id="modal-commit" role="dialog">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="modal-commit-title"></h4>
+	      </div>
+	      <div class="modal-body" id="modal-commit-body">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
 
 {% endblock content %}
