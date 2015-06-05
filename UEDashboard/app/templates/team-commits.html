@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block chart_js %}
+
+<script type="text/javascript">
+
+	$(function () {
+	    $(document).ready(function () {
+	        $('#chart-commits').highcharts({
+	            chart: {
+	                plotBackgroundColor: null,
+	                plotBorderWidth: null,
+	                plotShadow: false,
+	                style: {
+	                    fontFamily: 'Raleway'
+	                }
+	            },
+	            title: {
+	                text: 'Monthly Commits',
+	            },
+	            xAxis: {
+		            categories: {{ months_categories|safe }}
+		        },
+	            yAxis: {
+		            title: {
+		                text: 'Number of commits'
+		            },
+		            plotLines: [{
+		                value: 0,
+		                width: 1,
+		                color: '#808080'
+		            }]
+		        },
+		        legend: {
+		            layout: 'vertical',
+		            align: 'right',
+		            verticalAlign: 'middle',
+		            borderWidth: 0
+		        },
+	            series: {{ commits|safe }}
+
+	        });
+		});
+	});
+</script>
+
+{% endblock chart_js %}
+
+{% block content %}
+
+	<style type="text/css">
+
+		#team-commits {
+			background-color: #383838;
+		}
+	</style>
+
+	<h3><span class="fa fa-bar-chart-o"></span>&nbsp;Dashboard</h3>
+
+	<div id="chart-commits" class="charts"></div>
+
+{% endblock content %}

@@ -1,0 +1,149 @@
+<html>
+
+	<head>
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+		<link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/4.1.1/highcharts.js"></script>
+		<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+		{% block chart_js %}
+
+		{% endblock chart_js %}
+	</head>
+
+	<style type="text/css">
+
+		body, html {
+			height: 100%;
+			min-height: 100%;
+		}
+
+		body {
+			font-family: 'Raleway', serif;
+		}
+
+		.left-menu {
+			height: 100%;
+			background-color: #222629;
+			color: white;
+			position: fixed;
+		}
+
+	    .img-circle {
+      		width:70%;
+      		text-align: center;
+      		margin: 6% 18%;
+    	}
+
+    	.left-menu ul {
+    		list-style: none;
+    		padding-left: 0;
+    	}
+
+    	.left-menu li {
+		    line-height: 40px;
+		    text-indent: 7%;
+		}
+
+		.left-menu li a {
+		    display: block;
+		    text-decoration: none;
+		    color: #999999;
+		}
+
+		.left-menu li a:hover {
+		    text-decoration: none;
+		    color: #fff;
+		    background: rgba(255,255,255,0.2);
+		}
+
+		.left-menu li a:active,
+		.left-menu li a:focus {
+		    text-decoration: none;
+		}
+
+		.left-menu li hr {
+			border-color: #999999;
+		}
+
+		.second-level a {
+			text-indent: 10%;
+		}
+
+		.main {
+			margin-left: 17%
+		}
+
+		.main > h3{
+			margin: 5% 3%;
+		}
+
+		.charts {
+			width: 90%;
+			margin: 0 auto;
+			margin-bottom: 5%;
+		}
+
+		.first-level {
+			border: 1px solid #484848;
+			background: rgba(0,0,0,0.15);
+		}
+
+		.user-info {
+			text-align: center;
+		}
+
+		.summary, .events {
+			width: 90%;
+			margin: 0 auto;
+		}
+
+		td {
+			font-size: 13px;
+		}
+
+	</style>
+
+	<body>
+
+		<div class="row">
+		
+			<div class="col-md-2 left-menu">
+
+				<img src="http://www.lathem.com/portals/0/images/icons/icon_career_software.png" class="img-circle profile-avatar">
+				
+				<div class="user-info">
+					<p>{{ user }}</p>
+					<a href="/logout"><span class="fa fa-sign-out"></span>&nbsp;Log out</a>
+				</div>
+
+				<div class="row">
+				<br>
+				<ul>
+					<li class="first-level"><a href="#"><i class="fa fa-user"></i>&nbsp;&nbsp;My Contributions</a></li>
+					<li id="my-commits" class="second-level"><a href="/"><i class="fa fa-upload"></i>&nbsp;&nbsp;Commits</a></li>
+					<li id="my-bugs" class="second-level"><a href="#"><i class="fa fa-bug"></i>&nbsp;&nbsp;Bugs</a></li>
+					<li id="my-tasks" class="second-level"><a href="#"><i class="fa fa-tasks"></i>&nbsp;&nbsp;Tasks</a></li>
+					<li class="first-level"><a href="#"><i class="fa fa-group"></i>&nbsp;&nbsp;My Team</a></li>
+					<li id="team-commits" class="second-level"><a href="/team/commits"><i class="fa fa-upload"></i>&nbsp;&nbsp;Commits</a></li>
+					<li id="team-bugs" class="second-level"><a href="#"><i class="fa fa-bug"></i>&nbsp;&nbsp;Bugs</a></li>
+					<li id="team-tasks" class="second-level"><a href="#"><i class="fa fa-tasks"></i>&nbsp;&nbsp;Tasks</a></li>
+				</ul>
+				</div>
+			</div>
+
+			<div class="col-md-10 main">
+
+				{% block content %}
+
+				{% endblock content %}
+			</div>
+
+		</div>
+	</body>
+
+</html>
