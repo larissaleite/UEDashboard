@@ -2,7 +2,7 @@
 from flask import Flask, render_template, jsonify, make_response, request, flash, json
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text
-import datetime
+import datetime, collections
   
 app = Flask(__name__)
 
@@ -159,7 +159,7 @@ def get_events_by_developer():
 		if first is True:
 			dev = row["developer"]
 			first = False
-			
+
 		if row["developer"] != dev:
 			dev_array[dev] = developers
 			dev = row["developer"]
@@ -204,7 +204,8 @@ def get_events_by_date():
 
 	#add last date
 	date_array[json.dumps(date.isoformat())] = dates
-	return jsonify(events=date_array)
+	ordered_array = collections.OrderedDict(sorted(date_array.items()))
+	return jsonify(events=ordered_array)
 
 @app.route('/api/events/date/developer', methods = ['GET'])
 def get_events_by_date_developer():
@@ -234,7 +235,8 @@ def get_events_by_date_developer():
 
 	#add last date
 	date_array[json.dumps(date.isoformat())] = dates
-	return jsonify(events=date_array)
+	ordered_array = collections.OrderedDict(sorted(date_array.items()))
+	return jsonify(events=ordered_array)
 
 @app.route('/api/events/commit', methods = ['GET'])
 def get_events_by_commit():
